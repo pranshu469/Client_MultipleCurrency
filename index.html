@@ -1,0 +1,270 @@
+<html>
+   <title>Web Socket Test</title>
+  <body>
+    <h2>Web Socket Test</h2>
+   
+     
+  <form>
+        USD <input type="checkbox" id="checkUsd">
+        EUR <input type="checkbox" id="checkEur">
+        JPY <input type="checkbox" id="checkJpy">
+        HKD <input type="checkbox" id="checkHkd">
+        <button id="connectId" type="button" onclick="document.getElementById('demo').innerHTML =  testWebSocket();">Click me to connect</button>
+        <button id="resetId" type="button" onclick="document.getElementById('demo').innerHTML =  testWebSocketReset();">Click me to reset</button>
+    </form>
+    
+    <table id="table" border="1">
+        <tr>
+            <th>Selling Price</th>
+            <th>Buying Price</th>
+            <th>Currency</th>
+            <th>count</th>
+        </tr> 
+    </table>
+
+
+ <script language="javascript" type="text/javascript">
+
+
+  var wsUri = "ws://localhost:8084/Server_4_logger/server";
+  var output;
+  
+  var xUsd,yUsd;
+  var xEur,yEur;
+  var xJpy,yJpy;
+  var xHkd,yHkd;
+  
+  var countUsd=0;
+  var countEur=0;
+  var countHkd=0;
+  var countJpy=0;
+  var row,cell1,cell2,cell3,cell4;
+  var count;
+  var check=1;
+  var str;
+  
+ function init()
+ {
+   output = document.getElementById("output");
+ }
+
+ function testWebSocket()
+ {
+     //disable connect button
+     document.getElementById("connectId").disabled = true;
+    count=0;
+    str=""; 
+    if(document.getElementById("checkUsd").checked)
+    {
+        //websocket.send("usd");
+        str=str+"usd_";
+        count++;
+    }
+    if(document.getElementById("checkEur").checked)
+    {
+        //websocket.send("eur");
+        str=str+"eur_";
+        count++;
+    }
+    if(document.getElementById("checkJpy").checked)
+    {
+        //websocket.send("jpy");
+        str=str+"jpy_";
+        count++;
+    }
+    if(document.getElementById("checkHkd").checked)
+    {
+        //websocket.send("hkd");
+        str=str+"hkd_";
+        count++;
+    }
+    websocket = new WebSocket(wsUri);     
+    websocket.onopen = function(evt) {
+          websocket.send(str);
+    };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt)
+    {            
+        onMessage1(evt);
+        onMessage2(evt);
+    }
+    websocket.onerror = function(evt) { onError(evt) };
+
+  }
+  
+  
+  
+  function testWebSocketReset()
+  {
+     //enable connect button
+     document.getElementById("connectId").disabled = false;
+    str=null; 
+            
+    websocket.onopen = function(evt) {};
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt){onMessage2(evt)};
+    websocket.onerror = function(evt) { onError(evt) };
+
+  }
+  
+  
+  
+  
+  
+  
+
+    function onMessage1(evt)
+    {
+        
+        var obj1=JSON.parse(evt.data);
+        xUsd=obj1.BuyingPriceUsd;
+        yUsd=obj1.SellingPriceUsd;
+        
+        xEur=obj1.BuyingPriceEur;
+        yEur=obj1.SellingPriceEur;
+        
+        xJpy=obj1.BuyingPriceJpy;
+        yJpy=obj1.SellingPriceJpy;
+        
+        xHkd=obj1.BuyingPriceHkd;
+        yHkd=obj1.SellingPriceHkd;
+        
+        table=document.getElementById("table");
+        
+        check=1;
+
+        
+        if(typeof xUsd!=='undefined')
+        { 
+            
+            row = table.insertRow(check);
+            cell1 = row.insertCell(0);
+            cell2 = row.insertCell(1);
+            cell3 = row.insertCell(2);
+            cell4 = row.insertCell(3);
+            cell1.innerHTML = xUsd;
+            cell2.innerHTML = yUsd;
+            cell3.innerHTML = "usd";
+            cell4.innerHTML = countUsd;
+            countUsd++;
+            check=check+1;
+        }
+
+        if(typeof xEur!=='undefined')
+        {
+           
+            row = table.insertRow(check);
+            cell1 = row.insertCell(0);
+            cell2 = row.insertCell(1);
+            cell3 = row.insertCell(2);
+            cell4 = row.insertCell(3);
+            cell1.innerHTML = xEur;
+            cell2.innerHTML = yEur;
+            cell3.innerHTML = "eur";
+            cell4.innerHTML = countEur; 
+            countEur++;
+            check=check+1;
+        }  
+       
+        if(typeof xJpy!=='undefined')
+        {
+            
+            row = table.insertRow(check);
+            cell1 = row.insertCell(0);
+            cell2 = row.insertCell(1);
+            cell3 = row.insertCell(2);
+            cell4 = row.insertCell(3);
+            cell1.innerHTML = xJpy;
+            cell2.innerHTML = yJpy;
+            cell3.innerHTML = "jpy";
+            cell4.innerHTML = countJpy;
+            countJpy++;
+            check=check+1;
+        }
+       
+        if(typeof xHkd!=='undefined')
+        {
+            
+            row = table.insertRow(check);
+            cell1 = row.insertCell(0);
+            cell2 = row.insertCell(1);
+            cell3 = row.insertCell(2);
+            cell4 = row.insertCell(3);
+            cell1.innerHTML = xHkd;
+            cell2.innerHTML = yHkd;
+            cell3.innerHTML = "Hkd";
+            cell4.innerHTML = countHkd;
+            countHkd++;
+            check=check+1;
+        }
+        
+    
+     
+      }    
+    
+    function onMessage2(evt)
+    {
+            if(count===1)
+            {
+
+                table.deleteRow(2);
+
+            }
+            else if(count===2)
+            {
+
+                table.deleteRow(3);
+                table.deleteRow(4);
+
+            }
+            else if(count===3)
+            {
+
+                table.deleteRow(4);
+                table.deleteRow(5);
+                table.deleteRow(6);
+
+            }
+            else if(count===4)
+            {
+
+                table.deleteRow(5);
+                table.deleteRow(6);
+                table.deleteRow(7);
+                table.deleteRow(8);
+
+            }
+        
+    }
+   
+  
+    
+  function onError(evt){}
+  function doSend(message){}
+  function onOpen(evt){
+       
+       writeToScreen("COnnected");
+    
+  }
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+      document.getElementById(elementID).innerHTML = "";
+      websocket.close();
+  }
+  function writeToScreen(message)
+  {
+     
+    var pre = document.createElement("p");
+    pre.innerHTML = message;
+        output.appendChild(pre);
+     
+  }
+ 
+  window.addEventListener("load", init, false);
+
+  </script>
+  <div id="output"></div>
+  </body>
+
+</html>
